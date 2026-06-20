@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Watch saturation slider</title>
+<style>
+  :root {
+    --bg: #f4f3f0;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --red-100: #b2271a;
+    --red-50: #915249;
+    --red-0: #8a8a8a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem;
+  }
+  .image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e9e8e4;
+    margin-bottom: 1.75rem;
+  }
+  .image-wrap img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.05s linear;
+  }
+  #img-100 { opacity: 1; }
+  #img-50  { opacity: 0; }
+  #img-0   { opacity: 0; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  input[type="range"] {
+    flex: 1;
+    height: 28px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, var(--red-0) 0%, var(--red-50) 50%, var(--red-100) 100%);
+    border-radius: 14px;
+    outline: none;
+    transform: scaleX(-1);
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 28px;
+    border-radius: 14px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 28px;
+    border-radius: 14px;
+    background: linear-gradient(to right, var(--red-0) 0%, var(--red-50) 50%, var(--red-100) 100%);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #1a1a1a;
+    cursor: pointer;
+    margin-top: -2px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #1a1a1a;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .readout {
+    min-width: 48px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: right;
+  }
+  .labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+  .swatches {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.25rem;
+  }
+  .swatch-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .swatch-hex {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: "SF Mono", "Courier New", monospace;
+  }
+  .swatch-box {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Watch color saturation</h1>
+
+  <div class="image-wrap">
+    <img id="img-100" src="images/watch-100.png" alt="Watch at 100% saturation">
+    <img id="img-50" src="images/watch-50.png" alt="Watch at 50% saturation">
+    <img id="img-0" src="https://placehold.co/600x600/8a8a8a/ffffff?text=0%25+saturation+watch+image+here" alt="Watch at 0% saturation">
+  </div>
+
+  <div class="controls">
+    <input type="range" id="slider" min="0" max="100" value="100" step="1">
+    <div class="readout" id="readout">100%</div>
+  </div>
+  <div class="labels">
+    <span>100% saturation</span>
+    <span>0% saturation</span>
+  </div>
+
+  <div class="swatches">
+    <div class="swatch-item">
+      <div class="swatch-hex" id="swatch-hex">#B2271A</div>
+      <div class="swatch-box" id="swatch-box" style="background: var(--red-100);"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const slider = document.getElementById('slider');
+  const readout = document.getElementById('readout');
+  const img100 = document.getElementById('img-100');
+  const img50 = document.getElementById('img-50');
+  const img0 = document.getElementById('img-0');
+  const swatchBox = document.getElementById('swatch-box');
+  const swatchHex = document.getElementById('swatch-hex');
+
+  const COLOR_0 = [138, 138, 138];
+  const COLOR_50 = [145, 82, 73];
+  const COLOR_100 = [178, 39, 26];
+
+  function lerp(a, b, t) {
+    return Math.round(a + (b - a) * t);
+  }
+
+  function toHex(rgb) {
+    return '#' + rgb.map(c => c.toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+
+  function colorAt(val) {
+    if (val >= 50) {
+      const t = (val - 50) / 50;
+      return [
+        lerp(COLOR_50[0], COLOR_100[0], t),
+        lerp(COLOR_50[1], COLOR_100[1], t),
+        lerp(COLOR_50[2], COLOR_100[2], t)
+      ];
+    } else {
+      const t = val / 50;
+      return [
+        lerp(COLOR_0[0], COLOR_50[0], t),
+        lerp(COLOR_0[1], COLOR_50[1], t),
+        lerp(COLOR_0[2], COLOR_50[2], t)
+      ];
+    }
+  }
+
+  function update() {
+    const val = parseInt(slider.value, 10);
+    readout.textContent = val + '%';
+
+    let o100 = 0, o50 = 0, o0 = 0;
+
+    if (val >= 50) {
+      const t = (val - 50) / 50;
+      o100 = t;
+      o50 = 1 - t;
+    } else {
+      const t = val / 50;
+      o50 = t;
+      o0 = 1 - t;
+    }
+
+    img100.style.opacity = o100;
+    img50.style.opacity = o50;
+    img0.style.opacity = o0;
+
+    const rgb = colorAt(val);
+    const hex = toHex(rgb);
+    swatchBox.style.background = hex;
+    swatchHex.textContent = hex;
+  }
+
+  slider.addEventListener('input', update);
+  update();
+</script>
+
+</body>
+</html>
