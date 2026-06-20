@@ -56,9 +56,9 @@
     object-fit: contain;
     transition: opacity 0.05s linear;
   }
-  #img-100 { opacity: 1; }
-  #img-50  { opacity: 0; }
-  #img-0   { opacity: 0; }
+  #img-100 { z-index: 3; opacity: 0; }
+  #img-50  { z-index: 2; opacity: 1; }
+  #img-0   { z-index: 1; opacity: 0; }
 
   .controls {
     display: flex;
@@ -147,9 +147,9 @@
   <h1>Watch color saturation</h1>
 
   <div class="image-wrap">
-    <img id="img-100" src="watch-100-norm.png" alt="Watch at 100% saturation">
-    <img id="img-50" src="watch-50-norm.png" alt="Watch at 50% saturation">
-    <img id="img-0" src="watch-0-norm.png" alt="Watch at 0% saturation">
+    <img id="img-100" src="images/watch-100-norm.png" alt="Watch at 100% saturation">
+    <img id="img-50" src="images/watch-50-norm.png" alt="Watch at 50% saturation">
+    <img id="img-0" src="images/watch-0-norm.png" alt="Watch at 0% saturation">
   </div>
 
   <div class="controls">
@@ -217,11 +217,13 @@
     if (val >= 50) {
       const t = (val - 50) / 50;
       o100 = t;
-      o50 = 1 - t;
+      o50 = 1;
+      o0 = 0;
     } else {
       const t = val / 50;
+      o100 = 0;
       o50 = t;
-      o0 = 1 - t;
+      o0 = 1;
     }
 
     img100.style.opacity = o100;
